@@ -1,2 +1,164 @@
 #!/bin/bash
+
+###########################################################################################################
+# Parameters
+
+YOCTO_DIRECTORY="yocto"
+cd ..
+ROOT_DIRECTORY=`pwd`
+NR_CPUS=`grep -c ^processor /proc/cpuinfo`
+
+###########################################################################################################
+# Helper functions
+
+function internet_error {
+    echo "ERROR: Impossible to connect to Internet, double check your Internet connection."
+    exit 1
+}
+
+###########################################################################################################
+# Yocto installation
+
+cd ${ROOT_DIRECTORY}
+mkdir -p ${YOCTO_DIRECTORY}
+cd ${YOCTO_DIRECTORY}
+if [ ! -d .repo ]
+then
+    repo init -u https://github.com/architech-boards/tibidabo-manifest.git -b dora -m manifest.xml
+    [ $? -eq 0 ] || { rm -rf .repo; internet_error; }
+fi
+repo sync
+source poky/oe-init-build-env
+
+###########################################################################################################
+# conf/local.conf customization
+
+cd ${ROOT_DIRECTORY}/yocto/build
+BB_NUMBER_THREADS=`echo "${NR_CPUS} * 2" | bc -l`
+if [ -n "`grep "^BB_NUMBER_THREADS" conf/local.conf`" ]
+then
+    MATCH_LINE=`grep "^BB_NUMBER_THREADS" conf/local.conf`
+    sed -i "s|^${MATCH_LINE}|BB_NUMBER_THREADS ?= \"${BB_NUMBER_THREADS}\"|g" conf/local.conf
+elif [ -n "`grep "^#BB_NUMBER_THREADS" conf/local.conf`" ]
+then
+    MATCH_LINE=`grep "^#BB_NUMBER_THREADS" conf/local.conf`
+    sed -i "s|^${MATCH_LINE}|BB_NUMBER_THREADS ?= \"${BB_NUMBER_THREADS}\"|g" conf/local.conf   
+else
+    echo "BB_NUMBER_THREADS ?= \"${BB_NUMBER_THREADS}\"" >> conf/local.conf
+fi
+
+PARALLEL_MAKE=${BB_NUMBER_THREADS}
+if [ -n "`grep "^PARALLEL_MAKE" conf/local.conf`" ]
+then
+    MATCH_LINE=`grep "^PARALLEL_MAKE" conf/local.conf`
+    sed -i "s|^${MATCH_LINE}|PARALLEL_MAKE ?= \"${PARALLEL_MAKE}\"|g" conf/local.conf
+elif [ -n "`grep "^#PARALLEL_MAKE" conf/local.conf`" ]
+then
+    MATCH_LINE=`grep "^#PARALLEL_MAKE" conf/local.conf`
+    sed -i "s|^${MATCH_LINE}|PARALLEL_MAKE ?= \"${PARALLEL_MAKE}\"|g" conf/local.conf   
+else
+    echo "PARALLEL_MAKE ?= \"${PARALLEL_MAKE}\"" >> conf/local.conf
+fi
+
+if [ -n "`grep "^MACHINE" conf/local.conf`" ]
+then
+    MATCH_LINE=`grep "^MACHINE" conf/local.conf`
+    sed -i "s|^${MATCH_LINE}|MACHINE ??= \"tibidabo\"|g" conf/local.conf
+else
+    echo "MACHINE ??= \"tibidabo\"" >> conf/local.conf
+fi
+
+if [ -n "`grep "^ACCEPT_FSL_EULA" conf/local.conf`" ]
+then
+    MATCH_LINE=`grep "^ACCEPT_FSL_EULA" conf/local.conf`
+    sed -i "s|^${MATCH_LINE}|ACCEPT_FSL_EULA = \"1\"|g" conf/local.conf
+else
+    echo "ACCEPT_FSL_EULA = \"1\"" >> conf/local.conf
+fi
+
+###########################################################################################################
+# conf/bblayers.conf customization
+
+cd ${ROOT_DIRECTORY}/yocto/build
+TO_MATCH="poky/meta poky/meta-yocto poky/meta-yocto-bsp meta-openembedded/meta-initramfs meta-tibidabo meta-fsl-arm"
+BBLAYERS=""
+BBLAYERS_FOUND=`sed -n "/^BBLAYERS /,/\"/ p" conf/bblayers.conf | sed "s|BBLAYERS||g" | sed "s|?||g" | sed "s|=||g" | sed "s|\"||g" | sed "s|\n||g" | sed "s|\\\\\\||g"`
+
+for BBLAYER in $BBLAYERS_FOUND
+do
+    BBLAYERS="$BBLAYERS $BBLAYER"
+done
+
+for CURRENT_LAYER in $TO_MATCH
+do
+    LAYER_FOUND="no"
+    for BBLAYER in $BBLAYERS
+    do
+        if [ -n "`echo $BBLAYER | grep "$CURRENT_LAYER$"`" ]
+        then
+            LAYER_FOUND="yes"
+        fi
+    done
+    if [ ${LAYER_FOUND} == "no" ]
+    then
+        CURRENT_LAYER_FULL_PATH=${ROOT_DIRECTORY}/yocto/${CURRENT_LAYER}
+        BBLAYERS="${BBLAYERS} ${CURRENT_LAYER_FULL_PATH}"
+    fi
+done
+
+BBLAYERS="BBLAYERS ?= \"${BBLAYERS}\""
+
+if [ -z "`grep "^BBLAYERS " conf/bblayers.conf`" ]
+then
+    echo "$BBLAYERS" >> conf/bblayers.conf
+else
+    NUMBER_OF_LINES=`sed -n "/^BBLAYERS /,/\"/ {=;}" conf/bblayers.conf | wc -l`
+    if [ $NUMBER_OF_LINES -gt 1 ]
+    then
+        sed -i "/^BBLAYERS /,/\"/ s/^/#/" conf/bblayers.conf
+        echo "$BBLAYERS" >> conf/bblayers.conf
+    else
+        MATCH=`grep "^BBLAYERS " conf/bblayers.conf`
+        sed -i "s|^${MATCH}|${BBLAYERS}|g" conf/bblayers.conf
+    fi
+fi
+
+###########################################################################################################
+# Installing cross-toolchain
+
+cd ${ROOT_DIRECTORY}
+rm -rf temp
+mkdir -p temp
+cd temp
+wget http://downloads.architechboards.com/tibidabo/toolchain/dora/toolchain.txt
+[ $? -eq 0 ] || { cd ..; rm -rf temp; internet_error; }
+TOOLCHAIN_TARBALL=`cat toolchain.txt | awk -F" " '{print $1}'`
+TOOLCHAIN_MD5=`cat toolchain.txt | awk -F" " '{print $2}'`
+INSTALL_TOOLCHAIN="yes"
+if [ -f ../toolchain/toolchain.txt ]
+then
+    diff ../toolchain/toolchain.txt toolchain.txt
+    if [ $? -ne 0 ]
+    then
+        INSTALL_TOOLCHAIN="yes"
+    fi
+fi
+
+if [ "${INSTALL_TOOLCHAIN}" == "yes" ]
+then
+    wget http://downloads.architechboards.com/tibidabo/toolchain/dora/${TOOLCHAIN_TARBALL}.tar.gz
+    [ $? -eq 0 ] || { cd ..; rm -rf temp; internet_error; }
+    sync
+    DOWNLOAD_MD5=`md5sum ${TOOLCHAIN_TARBALL}.tar.gz | awk -F" " '{print $1}'`
+    [ "${TOOLCHAIN_MD5}" != "${DOWNLOAD_MD5}" ] && { cd ..; rm -rf temp; internet_error; }
+    rm -rf ../toolchain
+    mkdir ../toolchain
+    tar -C ../toolchain -xzf ${TOOLCHAIN_TARBALL}.tar.gz
+    cd ../toolchain
+    rm -rf ../temp
+    echo "${TOOLCHAIN_TARBALL} ${TOOLCHAIN_MD5}" > toolchain.txt
+    ./install.sh
+    
+fi
+
 exit 0
