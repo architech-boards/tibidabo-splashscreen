@@ -138,9 +138,9 @@ INSTALL_TOOLCHAIN="yes"
 if [ -f ../toolchain/toolchain.txt ]
 then
     diff ../toolchain/toolchain.txt toolchain.txt
-    if [ $? -ne 0 ]
+    if [ $? -eq 0 ]
     then
-        INSTALL_TOOLCHAIN="yes"
+        INSTALL_TOOLCHAIN="no"
     fi
 fi
 
@@ -151,14 +151,12 @@ then
     sync
     DOWNLOAD_MD5=`md5sum ${TOOLCHAIN_TARBALL}.tar.gz | awk -F" " '{print $1}'`
     [ "${TOOLCHAIN_MD5}" != "${DOWNLOAD_MD5}" ] && { cd ..; rm -rf temp; internet_error; }
-    rm -rf ../toolchain
-    mkdir ../toolchain
-    tar -C ../toolchain -xzf ${TOOLCHAIN_TARBALL}.tar.gz
-    cd ../toolchain
-    rm -rf ../temp
-    echo "${TOOLCHAIN_TARBALL} ${TOOLCHAIN_MD5}" > toolchain.txt
+    tar -xzf ${TOOLCHAIN_TARBALL}.tar.gz
     ./install.sh
-    
+    echo "${TOOLCHAIN_TARBALL} ${TOOLCHAIN_MD5}" > ../toolchain/toolchain.txt
 fi
+
+cd ..
+rm -rf temp/
 
 exit 0
