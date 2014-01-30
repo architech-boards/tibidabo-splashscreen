@@ -68,6 +68,14 @@ else
     echo "MACHINE ??= \"tibidabo\"" >> conf/local.conf
 fi
 
+if [ -n "`grep "^PACKAGE_CLASSES" conf/local.conf`" ]
+then
+    MATCH_LINE=`grep "^PACKAGE_CLASSES" conf/local.conf`
+    sed -i "s|^${MATCH_LINE}|PACKAGE_CLASSES ?= \"package_ipk\"|g" conf/local.conf
+else
+    echo "PACKAGE_CLASSES ?= \"package_ipk\"" >> conf/local.conf
+fi
+
 if [ -n "`grep "^ACCEPT_FSL_EULA" conf/local.conf`" ]
 then
     MATCH_LINE=`grep "^ACCEPT_FSL_EULA" conf/local.conf`
