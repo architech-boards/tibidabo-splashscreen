@@ -51,13 +51,13 @@ PARALLEL_MAKE=${BB_NUMBER_THREADS}
 if [ -n "`grep "^PARALLEL_MAKE" conf/local.conf`" ]
 then
     MATCH_LINE=`grep "^PARALLEL_MAKE" conf/local.conf`
-    sed -i "s|^${MATCH_LINE}|PARALLEL_MAKE ?= \"${PARALLEL_MAKE}\"|g" conf/local.conf
+    sed -i "s|^${MATCH_LINE}|PARALLEL_MAKE ?= \"-j ${PARALLEL_MAKE}\"|g" conf/local.conf
 elif [ -n "`grep "^#PARALLEL_MAKE" conf/local.conf`" ]
 then
     MATCH_LINE=`grep "^#PARALLEL_MAKE" conf/local.conf`
-    sed -i "s|^${MATCH_LINE}|PARALLEL_MAKE ?= \"${PARALLEL_MAKE}\"|g" conf/local.conf   
+    sed -i "s|^${MATCH_LINE}|PARALLEL_MAKE ?= \"-j ${PARALLEL_MAKE}\"|g" conf/local.conf   
 else
-    echo "PARALLEL_MAKE ?= \"${PARALLEL_MAKE}\"" >> conf/local.conf
+    echo "PARALLEL_MAKE ?= \"-j ${PARALLEL_MAKE}\"" >> conf/local.conf
 fi
 
 if [ -n "`grep "^MACHINE" conf/local.conf`" ]
