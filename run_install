@@ -208,8 +208,8 @@ install_file()
 
 cd $ROOT_DIRECTORY
 
-
-
+killall eclipse
+killall qtcreator
 
 # dowload script file to know what to do
 rm -f sdk.txt
