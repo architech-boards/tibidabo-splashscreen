@@ -216,13 +216,13 @@ rm -f sdk.txt
 wget http://downloads.architechboards.com/tibidabo/sdk/dora/sdk.txt
 [ $? -eq 0 ] || { rm sdk.txt; internet_error; }
 
-if [ -f sdk.txt.old ] 
-then
-	MD5_OLD=`md5sum sdk.txt.old | awk -F" " '{print $1}'`
-	MD5_NOW=`md5sum sdk.txt | awk -F" " '{print $1}'`
-
-    [ "${MD5_OLD}" == "${MD5_NOW}" ] && { echo "uguali"; }
-fi
+#if [ -f sdk.txt.old ] 
+#then
+#	MD5_OLD=`md5sum sdk.txt.old | awk -F" " '{print $1}'`
+#	MD5_NOW=`md5sum sdk.txt | awk -F" " '{print $1}'`
+#
+#   [ "${MD5_OLD}" == "${MD5_NOW}" ] && { echo "uguali"; }
+#fi
 
 # create backup of eclipse, workspace and java folders
 #if [ -d eclipse ]
