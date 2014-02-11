@@ -1,2 +1,3 @@
 #!/bin/bash
+~/architech_sdk/architech/tibidabo/eclipse/eclipse -vm ~/architech_sdk/architech/tibidabo/java/bin -data ~/architech_sdk/architech/tibidabo/workspace/eclipse
 exit 0
