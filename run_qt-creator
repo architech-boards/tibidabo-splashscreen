@@ -1,3 +1,4 @@
 #!/bin/bash
-~/architech_sdk/architech/tibidabo/qtcreator/bin/qtcreator -settingspath ~/architech_sdk/architech/tibidabo/qtcreator/conf
+cd ../qtcreator/bin
+./qtcreator --settingspath ../conf
 exit 0

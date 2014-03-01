@@ -6,6 +6,7 @@
 YOCTO_DIRECTORY="yocto"
 cd ..
 ROOT_DIRECTORY=`pwd`
+BASEROOT_SDK=${ROOT_DIRECTORY}
 NR_CPUS=`grep -c ^processor /proc/cpuinfo`
 
 ###########################################################################################################
@@ -202,7 +203,21 @@ install_file()
 	[ $? -eq 0 ] || { rm -f $FILE; undo_backup $CMD; rm sdk.txt; internet_error; }
 	mkdir $CMD
 	tar -zxf $FILE -C $CMD
+    find ${CMD} -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
 	[ $? -eq 0 ] || { rm -f $FILE; undo_backup $CMD; rm sdk.txt; internet_error; }
+	rm -f $FILE
+}
+
+install_qt_local_libraries()
+{
+	echo Install $CMD
+	URL=`echo $LINE | awk -F"@" '{print $2}'`
+	FILE=$CMD.tgz
+	wget ${URL}
+	[ $? -eq 0 ] || { rm -f $FILE; rm sdk.txt; internet_error; }
+	sudo tar -zxf $FILE -C /usr/local
+    find /usr/local/Trolltech -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
+	[ $? -eq 0 ] || { rm -f $FILE; rm sdk.txt; internet_error; }
 	rm -f $FILE
 }
 
@@ -216,23 +231,6 @@ rm -f sdk.txt
 wget http://downloads.architechboards.com/tibidabo/sdk/dora/sdk.txt
 [ $? -eq 0 ] || { rm sdk.txt; internet_error; }
 
-#if [ -f sdk.txt.old ] 
-#then
-#	MD5_OLD=`md5sum sdk.txt.old | awk -F" " '{print $1}'`
-#	MD5_NOW=`md5sum sdk.txt | awk -F" " '{print $1}'`
-#
-#   [ "${MD5_OLD}" == "${MD5_NOW}" ] && { echo "uguali"; }
-#fi
-
-# create backup of eclipse, workspace and java folders
-#if [ -d eclipse ]
-#then
-#	tar -zcf eclipse.backup.$DATE_BACKUP.tgz eclipse workspace java qtcreator qtlib
-#	[ $? -eq 0 ] || { internet_error; }
-#fi
-
-
-cat sdk.txt | \
 while read LINE; do
 
 	CMD=`echo $LINE | awk -F"@" '{print $1}'`
@@ -281,10 +279,10 @@ while read LINE; do
 					rm -f $FILE
 					;;
 				"qt-arm")
-					install_file
-					;;
+                    install_qt_local_libraries
+                    ;;
 				"qt-x86")
-					install_file
+                    install_qt_local_libraries
 					;;
 				"qtcreator")
 					install_file
@@ -299,6 +297,7 @@ while read LINE; do
 					wget $URL
 					[ $? -eq 0 ] || { undo_backup "qtcreator/conf"; rm sdk.txt; internet_error; }
 					tar -zxf $FILE -C qtcreator/
+                    find qtcreator/ -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
 					rm -f $FILE
                     ;;
                 "plugin")
@@ -319,7 +318,7 @@ while read LINE; do
 					rm -f $CONF
 					wget http://downloads.architechboards.com/tibidabo/sdk/dora/$CONF
 					[ $? -eq 0 ] || { undo_backup "workspace"; rm sdk.txt; internet_error; }
-					sed -i "s|@HOME@|${HOME}|g" $CONF
+					sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" $CONF
 					mkdir -p $PATH_CONF > /dev/null 2>&1
 					mv $CONF $PATH_CONF
                     ;;
@@ -336,13 +335,9 @@ while read LINE; do
                 *)
 					echo ""              
           esac
-done
+done < sdk.txt
 
 [ -f sdk.txt ] && { mv sdk.txt sdk.txt.old; }
-
-
-
-
 
 
 exit 0
