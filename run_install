@@ -297,8 +297,9 @@ while read LINE; do
 					wget $URL
 					[ $? -eq 0 ] || { undo_backup "qtcreator/conf"; rm sdk.txt; internet_error; }
 					tar -zxf $FILE -C qtcreator/
-                    find qtcreator/ -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
+                    			find qtcreator/ -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
 					rm -f $FILE
+					mkdir -p ${ROOT_DIRECTORY}/workspace/qt
                     ;;
                 "plugin")
 				# install or upgrade plugin of eclipse
