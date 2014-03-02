@@ -203,7 +203,7 @@ install_file()
 	[ $? -eq 0 ] || { rm -f $FILE; undo_backup $CMD; rm sdk.txt; internet_error; }
 	mkdir $CMD
 	tar -zxf $FILE -C $CMD
-    find ${CMD} -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
+    	find ${CMD} -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
 	[ $? -eq 0 ] || { rm -f $FILE; undo_backup $CMD; rm sdk.txt; internet_error; }
 	rm -f $FILE
 }
@@ -216,7 +216,7 @@ install_qt_local_libraries()
 	wget ${URL}
 	[ $? -eq 0 ] || { rm -f $FILE; rm sdk.txt; internet_error; }
 	sudo tar -zxf $FILE -C /usr/local
-    find /usr/local/Trolltech -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
+    	sudo find /usr/local/Trolltech -type f -exec sed -i "s|@BASEROOT_SDK@|${BASEROOT_SDK}|g" '{}' \;
 	[ $? -eq 0 ] || { rm -f $FILE; rm sdk.txt; internet_error; }
 	rm -f $FILE
 }
