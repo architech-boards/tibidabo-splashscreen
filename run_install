@@ -325,6 +325,7 @@ while read LINE; do
 				"build_workspace")
 				# build or rebuild the workspace
 					./eclipse/eclipse -vm java/bin -nosplash -application org.eclipse.jdt.apt.core.aptBuild -data ${ROOT_DIRECTORY}/workspace/eclipse
+					mkdir -p ${ROOT_DIRECTORY}/workspace/qt
 					;;
                 "cmd")
 				# execute a shell command from the script
