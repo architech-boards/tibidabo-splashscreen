@@ -414,6 +414,7 @@ then
 	echo "Install NFS server..."
 	sudo apt-get --force-yes install nfs-kernel-server
 	sudo service nfs-kernel-server restart
+	[ -f /etc/exports ] || { sudo touch /etc/exports; }
 fi
 
 grep "tibidabo" /etc/exports
