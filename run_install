@@ -302,13 +302,24 @@ do
 
 			CMD=`echo "${LINE}" | awk -F"@" '{print $1}'`
 
-			if [ -f sdk.txt.old ] 
+			if [ -f sdk.txt.old -a "${CMD}" != "doc" ] 
 			then
 				grep "${LINE}" sdk.txt.old
 				[ $? -eq 0 ] && { continue; }
 			fi
 
 			case  $CMD  in
+						# documentation, always updates it
+						"doc")
+							echo "DOC"
+                            URL=`echo $LINE | awk -F"@" '{print $2}'`
+                            FILE=`echo $LINE | awk -F"@" '{print $3}'`
+							mkdir docs;
+							wget --timeout=${WGET_TIMEOUT} ${URL}
+							[ $? -eq 0 ] || { rm -f $FILE; internet_error; }
+							unzip $FILE -d docs
+							rm -f $FILE
+						;;
 						# install or upgrade java runtime
 						"java")
 							echo "JAVA"
