@@ -16,7 +16,7 @@ WGET_TIMEOUT=60
 
 # Uncomment for see the debug comments
 #DEBUG=1
-set -x
+#set -x
 
 ###########################################################################################################
 # Helper functions
