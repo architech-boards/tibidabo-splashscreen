@@ -1,0 +1,1 @@
+A powerful i.MX6 Quad board with: 2GB of RAM, Marvell switch, mini PCI Express, mSATA, SD card, HDMI, LVDS, 4 USB host, USB OTG, and a big SPI NOR flash memory.

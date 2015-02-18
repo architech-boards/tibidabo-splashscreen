@@ -1,0 +1,109 @@
+<style type="text/css">
+    .TFtable{
+        width:100%; 
+        border-collapse:collapse; 
+    }
+    .TFtable td{ 
+        padding:2px;
+        border:#AAAAAA 1px solid;
+    }
+    /* provide some minimal visual accomodation for IE8 and below */
+    .TFtable tr{
+        background: #CCCCCC;
+    }
+    /*  Define the background color for all the ODD background rows  */
+    .TFtable tr:nth-child(odd){ 
+        background: #CCCCCC;
+    }
+    /*  Define the background color for all the EVEN background rows  */
+    .TFtable tr:nth-child(even){
+        background: #FFFFFF;
+    }
+</style>
+ArchiTech's <b>Tibidabo</b> board is a very powerful and flexible board.<br>
+<br>
+Specifications:
+<table class="TFtable">
+    <tr>
+        <td valign="top">
+            <b>CPU</b>
+        </td>
+        <td>
+            i.MX6 Quad
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>RAM</b>
+        </td>
+        <td>
+            2GB
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>Network</b>
+        </td>
+        <td>
+            Marvell mv88e6123 switch with two ethernet ports
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>USB</b>
+        </td>
+        <td>
+            4 USB 2.0 host<br>
+            1 USB 2.0 OTG that can be used to load the bootloader
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>Disks</b>
+        </td>
+        <td>
+            mSATA infterface
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>PCI</b>
+        </td>
+        <td>
+            mini PCI Express
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>Flash memory</b>
+        </td>
+        <td>
+            Micron SPI NOR with plenty of space for storing bootloader, kernel, and root filesystem
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>Video</b>
+        </td>
+        <td>
+            HDMI<br>
+            LVDS
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>Audio</b>
+        </td>
+        <td>
+            Audio over HDMI
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <b>SD</b>
+        </td>
+        <td>
+            Micro SD slot
+        </td>
+    </tr>
+</table>
