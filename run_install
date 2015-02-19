@@ -81,12 +81,18 @@ mkdir -p ${YOCTO_DIRECTORY}
 cd ${YOCTO_DIRECTORY}
 if [ ! -d .repo ]
 then
-    repo init -u https://github.com/rspelta/tibidabo-manifest.git -b ${YOCTO_VERSION} -m manifest.xml > /dev/null 2>&1
+    repo init -u https://github.com/architech-boards/tibidabo-manifest.git -b ${YOCTO_VERSION} -m manifest.xml > /dev/null 2>&1
     [ $? -eq 0 ] || { rm -rf .repo; internet_error; }
 fi
 repo sync > /dev/null 2>&1
 
-cp meta-fsl-bsp-release/imx/meta-fsl-arm/conf/machine/* meta-fsl-arm/conf/machine
+cd ${ROOT_DIRECTORY}
+cp ${YOCTO_DIRECTORY}/meta-fsl-bsp-release/imx/meta-fsl-arm/conf/machine/* ${YOCTO_DIRECTORY}/meta-fsl-arm/conf/machine
+wget --timeout=${WGET_TIMEOUT} ${URL_DOWNLOAD}/tibidabo/extra/fix-fsl-v2.0.0.patch
+[ $? -eq 0 ] || { cd ..; rm -rf temp; internet_error; }
+patch -p1 -d ${YOCTO_DIRECTORY}/ < fix-fsl-v2.0.0.patch
+rm fix-fsl-v2.0.0.patch
+cd ${YOCTO_DIRECTORY}
 
 source poky/oe-init-build-env
 
@@ -126,7 +132,7 @@ fi
 # conf/bblayers.conf customization
 
 cd ${ROOT_DIRECTORY}/yocto/build
-TO_MATCH="poky/meta poky/meta-yocto poky/meta-yocto-bsp meta-fsl-bsp-release/imx/meta-fsl-arm meta-fsl-bsp-release/imx/meta-fsl-demos meta-browser meta-openembedded/meta-gnome meta-openembedded/meta-initramfs meta-openembedded/meta-networking meta-openembedded/meta-ruby meta-qt5 meta-fsl-bsp-release/imx/meta-fsl-qt5 meta-fsl-bsp-release/imx/meta-fsl-bluez meta-tibidabo"
+TO_MATCH="poky/meta poky/meta-yocto meta-openembedded/meta-oe meta-openembedded/meta-multimedia meta-fsl-arm meta-fsl-arm-extra meta-fsl-demos meta-qt5 meta-fsl-bsp-release/imx/meta-fsl-qt5 meta-fsl-bsp-release/imx/meta-fsl-bluez meta-openembedded/meta-ruby meta-openembedded/meta-python meta-openembedded/meta-networking meta-openembedded/meta-gnome meta-browser meta-tibidabo meta-fsl-bsp-release/imx/meta-fsl-arm meta-fsl-bsp-release/imx/meta-fsl-demos"
 BBLAYERS=""
 BBLAYERS_FOUND=`sed -n "/^BBLAYERS /,/\"/ p" conf/bblayers.conf | sed "s|BBLAYERS||g" | sed "s|?||g" | sed "s|=||g" | sed "s|\"||g" | sed "s|\n||g" | sed "s|\\\\\\||g"`
 
