@@ -132,7 +132,7 @@ fi
 # conf/bblayers.conf customization
 
 cd ${ROOT_DIRECTORY}/yocto/build
-TO_MATCH="poky/meta poky/meta-yocto meta-openembedded/meta-oe meta-openembedded/meta-multimedia meta-fsl-arm meta-fsl-arm-extra meta-fsl-demos meta-qt5 meta-fsl-bsp-release/imx/meta-fsl-qt5 meta-fsl-bsp-release/imx/meta-fsl-bluez meta-openembedded/meta-ruby meta-openembedded/meta-python meta-openembedded/meta-networking meta-openembedded/meta-gnome meta-browser meta-tibidabo meta-fsl-bsp-release/imx/meta-fsl-arm meta-fsl-bsp-release/imx/meta-fsl-demos"
+TO_MATCH="poky/meta poky/meta-yocto poky/meta-yocto-bsp meta-openembedded/meta-oe meta-openembedded/meta-multimedia meta-fsl-arm meta-fsl-arm-extra meta-fsl-demos meta-qt5 meta-fsl-bsp-release/imx/meta-fsl-qt5 meta-fsl-bsp-release/imx/meta-fsl-bluez meta-openembedded/meta-ruby meta-openembedded/meta-python meta-openembedded/meta-networking meta-openembedded/meta-gnome meta-browser meta-fsl-bsp-release/imx/meta-fsl-arm meta-fsl-bsp-release/imx/meta-fsl-demos meta-tibidabo"
 BBLAYERS=""
 BBLAYERS_FOUND=`sed -n "/^BBLAYERS /,/\"/ p" conf/bblayers.conf | sed "s|BBLAYERS||g" | sed "s|?||g" | sed "s|=||g" | sed "s|\"||g" | sed "s|\n||g" | sed "s|\\\\\\||g"`
 
