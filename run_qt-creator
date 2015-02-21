@@ -1,4 +1,3 @@
 #!/bin/bash
-cd ../qtcreator/bin
-./qtcreator -settingspath ../conf
+zenity --error --text "Qt not yet available for Tibidabo"
 exit 0

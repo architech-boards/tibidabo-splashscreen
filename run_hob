@@ -1,3 +1,5 @@
 #!/bin/bash
-zenity --error --text "Hob not available for Tibidabo"
+cd ../yocto
+source poky/oe-init-build-env
+hob
 exit 0
