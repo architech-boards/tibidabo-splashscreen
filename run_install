@@ -42,6 +42,9 @@ YOCTO_DIRECTORY="yocto"
 cd ..
 ROOT_DIRECTORY=`pwd`
 BASEROOT_SDK=${ROOT_DIRECTORY}
+cd ..
+ARCHITECH_DIRECTORY=`pwd`
+cd ${ROOT_DIRECTORY}
 NR_CPUS=`grep -c ^processor /proc/cpuinfo`
 WGET_TIMEOUT=60
 
@@ -115,6 +118,21 @@ then
     sed -i "s|^${MATCH_LINE}|ACCEPT_FSL_EULA = \"1\"|g" conf/local.conf
 else
     echo "ACCEPT_FSL_EULA = \"1\"" >> conf/local.conf
+fi
+
+if [ -n "`grep "^DL_DIR" conf/local.conf`" ]
+then
+	MATCH_LINE=`grep "^DL_DIR" conf/local.conf`
+	sed -i "s|^${MATCH_LINE}|DL_DIR = \"${ARCHITECH_DIRECTORY}/downloads\"|g" conf/local.conf
+else
+	echo "DL_DIR = \"${ARCHITECH_DIRECTORY}/downloads\"" >> conf/local.conf
+fi
+if [ -n "`grep "^SSTATE_DIR" conf/local.conf`" ]
+then
+	MATCH_LINE=`grep "^SSTATE_DIR" conf/local.conf`
+	sed -i "s|^${MATCH_LINE}|SSTATE_DIR = \"${ARCHITECH_DIRECTORY}/sstate-cache\"|g" conf/local.conf
+else
+	echo "SSTATE_DIR = \"${ARCHITECH_DIRECTORY}/sstate-cache\"" >> conf/local.conf
 fi
 
 ###########################################################################################################
